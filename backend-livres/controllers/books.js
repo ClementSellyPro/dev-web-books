@@ -1,21 +1,36 @@
+const fs = require('fs');
+const path = require('path');
+const sharp = require('sharp');
 const Book = require('../models/Book');
 
-exports.createBook = (req, res, next) => {
-  console.log("This is the req.body.book ::: ", req.body.book);
-  const bookObject = JSON.parse(req.body.book);
-  delete bookObject._id;
-  delete bookObject._userID;
+exports.createBook = async (req, res, next) => {
+    const bookObject = JSON.parse(req.body.book);
+    delete bookObject._id;
+    delete bookObject._userID;
+  
+    // Prepare the new file name (.webp)
+    const imageName = req.file.filename;
+    const nameWithoutExt = path.parse(imageName).name;
+    const webpFilename = `${nameWithoutExt}_${Date.now()}.webp`
+    const imagePath = path.join(__dirname, '../images', webpFilename);
+  
+    // Convert the uploaded image to .webp and overwrite into /images
+    await sharp(req.file.path)
+    .webp({ quality: 20 })
+    .toFile(imagePath);
 
-  console.log("This is the req.body.book after delete id ::: ", bookObject);
+    // Delete the original image (jpg/png)
+    fs.unlink(req.file.path, (err) => {
+      if (err) console.error("Failed to delete original image:", err);
+    });
+  
+    const book = new Book({
+      ...bookObject,
+      userID: req.auth.userID,
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${webpFilename}`
+    });
 
-  const book = new Book({
-    ...bookObject,
-    userID: req.auth.userID,
-    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-  });
-  delete book._id;
-  console.log("This is the book::: ", book)
-  book.save()
-  .then(() => res.status(201).json({ message: "Livre correctement ajouté" }))
-  .catch(error => res.status(400).json({ error: "Erreur ::: ", error }))
+    await book.save()
+    .then(() => res.status(201).json({ message: "Livre correctement ajouté" }))
+    .catch(error => res.status(400).json({ error: "Erreur ::: ", error }))
 }
