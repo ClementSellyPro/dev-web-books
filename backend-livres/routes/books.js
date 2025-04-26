@@ -6,5 +6,6 @@ const router = express.Router();
 const booksCtrl = require('../controllers/books');
 
 router.post('/', auth, multer, booksCtrl.createBook);
+router.get('/', booksCtrl.getAllBooks);
 
 module.exports = router;

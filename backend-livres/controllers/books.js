@@ -3,6 +3,12 @@ const path = require('path');
 const sharp = require('sharp');
 const Book = require('../models/Book');
 
+exports.getAllBooks = (req, res, next) => {
+  Book.find()
+  .then(books => res.status(200).json(books))
+  .catch(error => res.status(400).json({ error }));
+}
+
 exports.createBook = async (req, res, next) => {
     const bookObject = JSON.parse(req.body.book);
     delete bookObject._id;
