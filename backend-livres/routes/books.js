@@ -5,7 +5,9 @@ const multer = require('../middleware/multer-config');
 const router = express.Router();
 const booksCtrl = require('../controllers/books');
 
-router.post('/', auth, multer, booksCtrl.createBook);
 router.get('/', booksCtrl.getAllBooks);
+router.get('/:id', booksCtrl.getOneBook);
+router.get('/bestrating', booksCtrl.getBestRating);
+router.post('/', auth, multer, booksCtrl.createBook);
 
 module.exports = router;
