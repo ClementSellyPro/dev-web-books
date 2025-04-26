@@ -46,3 +46,9 @@ exports.createBook = async (req, res, next) => {
     .then(() => res.status(201).json({ message: "Livre correctement ajouté" }))
     .catch(error => res.status(400).json({ error: "Erreur ::: ", error }))
 }
+
+exports.modifyOneBook = (req, res, next) => {
+  Book.updateOne({ _id: req.params.id }, { ...req.body, _id: req.params.id})
+  .then(() => res.status(200).json({ message: "Livre modifié"}))
+  .catch(error => res.status(400).json({ error }));
+}
