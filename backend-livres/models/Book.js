@@ -10,9 +10,7 @@ const bookSchema = mongoose.Schema({
   ratings: [
     {
       userId: {
-        //type: Schema.Types.ObjectId, // references a MongoDB ObjectId
         type: String,
-        //ref: 'User', // optional: if you have a User model
         required: true,
       },
       grade: {
